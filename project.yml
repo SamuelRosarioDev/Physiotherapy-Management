@@ -1,0 +1,9 @@
+Detalhes do Projeto
+
+O projeto deverá ser desenvolvido utilizando o framework Django e deverá incluir as seguintes funcionalidades:
+
+    Cadastro de Pacientes: Sistema para registrar e gerenciar informações de pacientes.
+    Cadastro de Profissionais: Sistema para registrar e gerenciar informações dos profissionais de fisioterapia.
+    Agendamento de Aulas: Sistema de agendamento de sessões de fisioterapia, permitindo a gestão de horários e disponibilidade.
+    Formulário de Atendimento da Aula: Ferramenta para o registro das informações e observações durante as sessões de fisioterapia.
+    Gestão Financeira: Sistema para o controle financeiro, incluindo pagamentos, despesas e receitas da clínica.

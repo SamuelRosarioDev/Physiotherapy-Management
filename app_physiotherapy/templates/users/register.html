@@ -1,0 +1,16 @@
+{% extends 'users/header.html' %}
+{% block content %}
+<main style="height: 100vh;" class="d-flex align-items-center justify-content-center container">
+    <form action="{% url 'create_users' %}" method='post'>
+        <h2>Cadastrar</h2>
+        {% csrf_token %}
+        <div class="d-flex align-items-center flex-column gap-1">
+            <input name="nome" type="text" placeholder="Nome" required />
+            <input name="idade" type="number" placeholder="Idade" required />
+            <input name="senha" type="password" placeholder="Senha" required />
+
+            <button class="btn btn-success">Cadastrar</button>
+        </div>
+    </form>
+</main>
+{% endblock %}
