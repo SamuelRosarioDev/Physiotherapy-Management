@@ -3,18 +3,23 @@
     <div style="padding-top: 5.5rem;" class="container">
         <table class="table table-bordered table-striped">
             <tr>
-                <th>id</th>
-                <th>nome</th>
-                <th>idade</th>
-                <th>senha</th>
+                <th>ID</th>
+                <th>NOME</th>
+                <th>EMAIL</th>
+                <th>IDADE</th>
+                <th>SENHA</th>
+                <th>TIPO DE USUÁRIO</th>
             </tr>
             <!-- Está percorrendo os users -->
             {% for user in users %}
             <tr>
                 <td>{{user.id_user}}</td>
                 <td>{{user.name}}</td>
+                <td>{{user.email}}</td>
                 <td>{{user.age}}</td>
                 <td>{{user.password}}</td>
+                <td>{{user.type_user}}</td>
+
             </tr>
             {% endfor %}
 

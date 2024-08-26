@@ -8,6 +8,7 @@ urlpatterns = [
     path('login', views.login, name='login'),
     
     path('created', views.create_users, name='create_users'),
-    path('list', views.login_users, name='login_users'),
+    path('portal', views.login_users, name='login_users'),
+    
     path('admin', admin.site.urls),
 ]
