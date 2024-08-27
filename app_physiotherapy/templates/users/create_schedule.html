@@ -1,0 +1,82 @@
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Agendamentos</title>
+</head>
+
+<body>
+    <div style="width: 100vw;" class="d-flex flex-column ">
+
+        <div style="box-shadow: 0 0 1rem #dc3545" class=" bg-danger bg-gradient ">
+            <a style="margin: 1rem;" href="#"
+                class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><-Voltar</a>
+
+                    <form action="{% url 'create_schedule' %}" method="POST" style="margin-bottom: 1rem;"
+                        class="d-flex flex-column align-items-center justify-content-center gap-2">
+                        <h4>Criar agendamento</h4>
+                        {% csrf_token %}
+
+                        <input style="width: 15rem;" type="text" name="paciente_name" placeholder="Nome do paciente"
+                            value={{users.name}} required>
+                        <label for="appointment_date">Data do Agendamento:</label>
+                        <input style="width: 15rem;" type="date" name="data" required>
+
+                        <label for="appointment_time">Horário do Agendamento:</label>
+                        <input style="width: 15rem;" type="time" name="horario" required>
+
+                        <select style="width: 15rem;" name="doutor" required>
+                            <option value="" disabled selected hidden>Selecione um doutor</option>
+                            <option value="Samuel">Samuel</option>
+                            <option value="Roberto">Roberto</option>
+                            <option value="Mario">Mario</option>
+                        </select>
+                        <textarea style="width: 15rem;" placeholder='informações extras "opicional"'
+                            name="info_extra"></textarea>
+
+                        <button style="width: 15rem; border: none;">Agendar</button>
+                    </form>
+        </div>
+
+        <div class="container">
+            <h2>Agendamentos Confirmados</h2>
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th>PACIENTE*</th>
+                    <th>DATA*</th>
+                    <th>HORÁRIO*</th>
+                    <th>PROFISSIONAL*</th>
+                    <th>INFOS EXTRA</th>
+                    <th>DELETE</th>
+                </tr>
+
+                <!-- Está percorrendo os users -->
+                {% for scheduler in schedulers %}
+
+                <tr>
+                    <td>{{scheduler.name}}</td>
+                    <td>{{scheduler.date}}</td>
+                    <td>{{scheduler.hourly}}</td>
+                    <td>{{scheduler.doctor}}</td>
+                    <td>{{scheduler.extra}}</td>
+                </tr>
+
+                {% endfor %}
+            </table>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+</html>
+{% endblock %}

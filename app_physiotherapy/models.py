@@ -7,3 +7,12 @@ class User(models.Model):
     age = models.IntegerField()
     password = models.TextField()
     type_user = models.TextField()
+
+class Scheduler (models.Model):
+    name = models.TextField(max_length=10)
+    date = models.DateField()
+    hourly = models.TimeField()
+    doctor = models.TextField()
+    extra = models.TextField()
+    
+    
