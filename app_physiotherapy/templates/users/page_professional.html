@@ -17,7 +17,7 @@
         <nav class="navbar bg-body-tertiary" style="background-color: #e3f2fd;">
             <a class="nav-link navbar-brand" href="{% url 'home' %}">Fisioterapia</a>
             <img class="w-5" src="{% static 'iconfisioterapia/icon.png' %}" alt="">
-            <a class="nav-link navbar-brand" href="#">Pendentes</a>
+            <a class="nav-link navbar-brand" href="{% url 'list_sessions' %}">Pendentes</a>
         </nav>
     </header>
     <main class="container" style="padding-top: 6rem; height: 100vh;">

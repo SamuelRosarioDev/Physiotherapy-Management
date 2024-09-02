@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Sessões</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Lista de Sessões</h2>
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Paciente</th>
+                    <th>Idade</th>
+                    <th>Data</th>
+                    <th>Hora</th>
+                    <th>Progresso</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Próxima Etapa</th>
+                    <th>Cancelar</th>
+                </tr>
+            </thead>
+                {% for session in sessions %}
+                <tr>
+                    <td>{{ session.name }}</td>
+                    <td>{{ session.age }}</td>
+                    <td>{{ session.date }}</td>
+                    <td>{{ session.hourly }}</td>
+                    <td>{{ session.progress }}</td>
+                    <td>R${{ session.value }}</td>
+                    <td class="{% if session.status == 'pago' %}text-success{% else %}text-danger{% endif %}">
+                        {{ session.status }}
+                    </td>
+
+                    <td>
+                        {% if session.status == 'pagar' %}
+                        <button class="btn btn-success btn-sm" type="submit" disabled>Progredir</button>
+                        {% else %}
+                        <button class="btn btn-success btn-sm" data-toggle="modal"
+                            data-target="#modal-{{ session.id }}">Progredir</button>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'delete_schedule' session.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Cancelar</button>
+                        </form>
+                    </td>
+                </tr>
+
+            <!-- Modal para cada sessão -->
+            <div class="modal fade" id="modal-{{ session.id }}" tabindex="-1"
+                aria-labelledby="modalLabel-{{ session.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel-{{ session.id }}">Progredir Sessão</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-{{ session.id }}" method="post" action="{% url 'progress_session' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="session_id" value="{{ session.id }}">
+                                <div class="form-group">
+                                    <label for="new_date">Nova Data:</label>
+                                    <input type="date" class="form-control" id="new_date" name="new_date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new_time">Nova Hora:</label>
+                                    <select class="form-control" id="new_time" name="new_time" required>
+                                        <option value="">Selecione um horário</option>
+                                        <option value="08:00">07:30</option>
+                                        <option value="14:00">14:00</option>
+                                        <option value="17:00">17:00</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

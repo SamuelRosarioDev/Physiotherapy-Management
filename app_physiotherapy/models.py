@@ -9,10 +9,14 @@ class User(models.Model):
     type_user = models.TextField()
 
 class Scheduler (models.Model):
+    STATUS_CHOICES = [('pagar', 'Pagar'), ('pago', 'Pago')]
+    
+    status = models.CharField(max_length=20, default='pending', choices=STATUS_CHOICES)
     name = models.TextField(max_length=10)
     date = models.DateField()
     hourly = models.TimeField()
     doctor = models.TextField()
-    extra = models.TextField()
-    
-    
+    age = models.TextField()
+    progress = models.TextField(default='Consulta')
+    value = models.TextField(default=100)
+

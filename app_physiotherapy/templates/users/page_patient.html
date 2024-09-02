@@ -12,11 +12,15 @@
 </head>
 
 <body>
-    <header style="z-index: 1; width: 100%;" class=" position-fixed shadow p-3 mb-5 bg-body-tertiary rounded">
+    <header style="z-index: 1; width: 100%;" class="position-fixed shadow p-3 mb-5 bg-body-tertiary rounded">
         <nav class="navbar bg-body-tertiary" style="background-color: #e3f2fd;">
             <a class="nav-link navbar-brand" href="{% url 'home' %}">Fisioterapia</a>
             <img class="w-5" src="{% static 'iconfisioterapia/icon.png' %}" alt="">
-            <a class="nav-link navbar-brand" href="{% url 'create_schedule' %}">Agendamentos</a>
+            <div class="d-flex">
+                <a class="nav-link navbar-brand" href="{% url 'create_schedule' %}">Agendamentos</a>
+                <a class="nav-link navbar-brand" href="{% url 'payment_page' %}">Pagamentos</a>
+            </div>
+
         </nav>
     </header>
     <main class="" style="padding-top: 6rem; height: 100vh;">
