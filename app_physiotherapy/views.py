@@ -1,170 +1,118 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView, CreateView, ListView, UpdateView, DeleteView
 from .models import User, Scheduler
-from django.core.exceptions import ValidationError
 
 # Rotas públicas
-def home(request):
-    return render(request, 'users/home.html')
+class HomeView(TemplateView):
+    template_name = 'users/home.html'
 
-def login(request):
-    return render(request, 'users/login.html')
+class LoginView(TemplateView):
+    template_name = 'users/login.html'
 
-def register(request):
-    return render(request, 'users/register.html' )
-
-def create_users(request):
-    # Salva informações da tela e envia para o banco de dados SQLite
-    if request.method == 'POST':
-        new_user = User()
-        new_user.name = request.POST.get('nome')
-        new_user.email = request.POST.get('email')
-        new_user.age = request.POST.get('idade')
-        new_user.password = request.POST.get('senha')
-        new_user.type_user = request.POST.get('tipo_de_usuario')
-        new_user.save()
-    return render(request,'users/register.html')
-
-def login_users(request):
-    # Login
-    name = request.POST.get('nome')
-    password = request.POST.get('senha')
-    
-    user = User.objects.filter(name=name, password=password).first()
-    
-    if user:
-        request.session['user_name'] = user.name
-        if user.type_user == "profissional":
-            return render(request, 'users/page_professional.html')
-        elif user.type_user == "paciente": 
-            return render(request, 'users/page_patient.html')
-    else:
-        return render(request, 'login.html', {'error': 'Usuário ou senha inválidos'})
-
-def create_schedule(request):
-    # Cria agendamento
-    name_logado = request.session.get('user_name')
-    user = User.objects.filter(name=name_logado, type_user="paciente").first()
-    profissionais = User.objects.filter(type_user="profissional")
-    
-    progress_options = [
-        {'progress': 'Consulta', 'valor': 100},
-        {'progress': 'Sessão de fisioterapia', 'valor': 150},
-        {'progress': 'Revisão', 'valor': 120},
-    ]
-    
-    if request.method == 'POST':
+    def post(self, request):
+        name = request.POST.get('nome')
+        password = request.POST.get('senha')
+        
+        user = User.objects.filter(name=name, password=password).first()
+        
         if user:
-            
-            new_scheduler = Scheduler()
-            new_scheduler.status = "pagar"
-            new_scheduler.name = request.POST.get('paciente_name')
-            new_scheduler.date = request.POST.get('data')
-            new_scheduler.hourly = request.POST.get('horario')
-            new_scheduler.doctor = request.POST.get('doutor')
-            new_scheduler.age = request.POST.get('age')
-            new_scheduler.progress = 'Consulta'
-            new_scheduler.value = 100
-            
-            new_scheduler.save()
-
-            return redirect('create_schedule')
-
-        else:
-            return render(request, 'error.html', {'error': 'Usuário não encontrado'})
-    
-    if user:
-        scheduler = Scheduler.objects.filter(name=user.name)
-    else:
-        scheduler = Scheduler.objects.none()
-    
-    context = {
-        'schedulers': scheduler,
-        'users': user,
-        'profissionais': profissionais,
-        'progress_options': progress_options,
-    }
-    
-    return render(request, 'users/create_schedule.html', context)
-
-def delete_schedule(request, id):
-    # Deleta agendamento
-    scheduler = get_object_or_404(Scheduler, id=id)
-    
-    name_logado = request.session.get('user_name')
-    user = User.objects.filter(name=name_logado).first()
-
-    if request.method == 'POST':
-   
-        if user and (user.type_user in ["profissional", "paciente"]):
-            scheduler.delete()
-            
-     
+            request.session['user_name'] = user.name
             if user.type_user == "profissional":
-                return redirect('list_sessions')
-            else: 
-                return redirect('create_schedule')
+                template_name = 'users/page_professional.html'
+                return render(request, template_name)
+            elif user.type_user == "paciente":
+                template_name = 'users/page_patient.html'
+                return render(request, template_name)
         else:
-            return redirect('error_page') 
+            return render(request, self.template_name, {'error': 'Usuário ou senha inválidos'})
 
-    return redirect('error_page')
+class UserCreateView(CreateView):
+    model = User
+    fields = ['name', 'email', 'age', 'password', 'type_user']
+    template_name = 'users/register.html'
+    success_url = reverse_lazy('login')
 
+    def form_valid(self, form):
+        # Adicionar lógica extra se necessário, como hash de senha
+        return super().form_valid(form)
 
-def payment_page(request):
-    # Carrega a tela de pagamento
-    name_logado = request.session.get('user_name')
-    
-    user = User.objects.filter(name=name_logado).first()
-    
-    if user:
-        pending_payments = Scheduler.objects.filter(name=name_logado)
-    else:
-        pending_payments = Scheduler.objects.none()
-    
-    return render(request, 'users/payment_page.html', {'pending_payments': pending_payments})
+class SchedulerCreateView(CreateView):
+    model = Scheduler
+    fields = ['name', 'date', 'hourly', 'doctor', 'age', 'progress', 'value']
+    template_name = 'users/create_schedule.html'
+    success_url = reverse_lazy('create_schedule')
 
-def mark_as_paid(request, id):
-    # Faz o pagamento
-    scheduler = get_object_or_404(Scheduler, id=id)
-    if request.method == 'POST':
-        scheduler.status = "pago"
-        scheduler.save()
-        return redirect('payment_page')  
-    
-    return render(request, 'error.html', {'error': 'Método não permitido'})
+    def form_valid(self, form):
+        # Definindo campos padrão como status e o progresso inicial
+        form.instance.status = "pagar"
+        form.instance.progress = "Consulta"
+        form.instance.value = 100  # valor padrão
+        return super().form_valid(form)
 
-def list_sessions(request):
-    # Lista de agendamentos
-    name_logado = request.session.get('user_name')
-    
-    user = User.objects.filter(name=name_logado).first()
-    
-    if user and user.type_user == "profissional":
-        sessions = Scheduler.objects.filter(doctor=name_logado)
-    else:
-        sessions = Scheduler.objects.none()
-    
-    return render(request, 'users/list_sessions.html', {'sessions': sessions})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        name_logado = self.request.session.get('user_name')
+        context['users'] = User.objects.filter(name=name_logado, type_user="paciente").first()
+        context['profissionais'] = User.objects.filter(type_user="profissional")
+        context['progress_options'] = [
+            {'progress': 'Consulta', 'valor': 100},
+            {'progress': 'Sessão de fisioterapia', 'valor': 150},
+            {'progress': 'Revisão', 'valor': 120},
+        ]
+        return context
 
-def progress_session(request):
-    # atualiza o progresso
-    if request.method == 'POST':
-        session_id = request.POST.get('session_id')
-        new_date = request.POST.get('new_date')
-        new_time = request.POST.get('new_time')
+class SessionListView(ListView):
+    model = Scheduler
+    template_name = 'users/list_sessions.html'
+    context_object_name = 'sessions'
 
-        # Verifique se os campos de data e hora foram preenchidos corretamente
-        if not new_date or not new_time:
-            return render(request, 'users/list_sessions.html', {
-                'sessions': Scheduler.objects.all(),
-                'error': 'Data e hora são obrigatórios'
-            })
+    def get_queryset(self):
+        name_logado = self.request.session.get('user_name')
+        user = User.objects.filter(name=name_logado).first()
+        if user and user.type_user == "profissional":
+            return Scheduler.objects.filter(doctor=name_logado)
+        return Scheduler.objects.none()
 
-        session = get_object_or_404(Scheduler, id=session_id)
+class SchedulerDeleteView(DeleteView):
+    model = Scheduler
+    template_name = 'users/confirm_delete.html'
+    success_url = reverse_lazy('list_sessions')
 
-        # Atualize a data e hora da sessão
-        session.date = new_date
-        session.hourly = new_time
+    def get_queryset(self):
+        name_logado = self.request.session.get('user_name')
+        user = User.objects.filter(name=name_logado).first()
+        if user and (user.type_user == "profissional" or user.type_user == "paciente"):
+            return Scheduler.objects.filter(id=self.kwargs['pk'])
+        return Scheduler.objects.none()
 
+class MarkAsPaidView(UpdateView):
+    model = Scheduler
+    fields = []
+    template_name = 'users/mark_as_paid.html'
+    success_url = reverse_lazy('payment_page')
+
+    def form_valid(self, form):
+        form.instance.status = 'pago'
+        return super().form_valid(form)
+
+class PaymentPageView(ListView):
+    model = Scheduler
+    template_name = 'users/payment_page.html'
+    context_object_name = 'pending_payments'
+
+    def get_queryset(self):
+        name_logado = self.request.session.get('user_name')
+        return Scheduler.objects.filter(name=name_logado)
+
+class ProgressSessionView(UpdateView):
+    model = Scheduler
+    fields = ['date', 'hourly']
+    template_name = 'users/progress_session.html'
+    success_url = reverse_lazy('list_sessions')
+
+    def form_valid(self, form):
+        session = form.instance
         progress_map = {
             'Consulta': ('Sessão de fisioterapia', 150),
             'Sessão de fisioterapia': ('Revisão', 120)
@@ -175,16 +123,7 @@ def progress_session(request):
             session.status = "pagar"
         elif session.progress == 'Revisão' and session.status == 'pago':
             session.delete()
-            return redirect('list_sessions')
         else:
             session.status = "pagar"
 
-        try:
-            session.save()
-        except ValidationError as e:
-            return render(request, 'users/list_sessions.html', {
-                'sessions': Scheduler.objects.all(),
-                'error': str(e)
-            })
-
-    return redirect('list_sessions')
+        return super().form_valid(form)
