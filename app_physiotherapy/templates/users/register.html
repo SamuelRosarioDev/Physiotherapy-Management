@@ -4,24 +4,27 @@
     <form action="{% url 'create_users' %}" method='post'>
         <h2>Cadastrar</h2>
         {% csrf_token %}
-        <div class="d-flex align-items-center flex-column gap-1">
-            <div style="width: 100%;" class="d-flex align-items-start justify-content-start flex-column">
-                <div class="form-check">
-                    <input style="background-color: #00000041;" class="form-check-input" type="radio" name="tipo_de_usuario"value="paciente" checked>
-                    <label class="form-check-label" for="flexRadioDefault1">Paciente</label>
-                </div>
-                <div class="form-check">
-                    <input style="background-color: #00000041;" class="form-check-input" type="radio" name="tipo_de_usuario"value="profissional">
-                    <label class="form-check-label" for="flexRadioDefault2">Profissional</label>
-                </div>
+        <div style="width: 100%;" class="d-flex align-items-start justify-content-start flex-column">
+            <label>Tipo de Usuário:</label>
+            <div class="form-check">
+                <input style="background-color: #00000041;" class="form-check-input" type="radio" name="type_user"
+                    value="paciente" id="flexRadioDefault1" checked>
+                <label class="form-check-label" for="flexRadioDefault1">Paciente</label>
             </div>
-
-            <input name="nome" type="text" placeholder="Nome" required />
-            <input name="email" type="email" placeholder="Email" required />
-            <input name="idade" type="number" placeholder="Idade" required />
-            <input name="senha" type="password" placeholder="Senha" required />
-            <button class="btn btn-success">Cadastrar</button>
+            <div class="form-check">
+                <input style="background-color: #00000041;" class="form-check-input" type="radio" name="type_user"
+                    value="profissional" id="flexRadioDefault2">
+                <label class="form-check-label" for="flexRadioDefault2">Profissional</label>
+            </div>
         </div>
+        {{ form.name }}
+        {{ form.email }}
+        {{ form.age }}
+        {{ form.password }}
+
+        </div>
+        <button class="btn btn-success">Cadastrar</button>
+
     </form>
 </main>
 {% endblock %}

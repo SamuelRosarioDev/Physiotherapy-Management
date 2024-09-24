@@ -16,5 +16,5 @@ urlpatterns = [
     path('delete_schedule/<int:pk>/', views.SchedulerDeleteView.as_view(), name='delete_schedule'),
     path('mark_as_paid/<int:pk>/', views.MarkAsPaidView.as_view(), name='mark_as_paid'),
     path('payment_page/', views.PaymentPageView.as_view(), name='payment_page'),
-    path('progress_session/<int:pk>/', views.ProgressSessionView.as_view(), name='progress_session'),
+    path('list_sessions/<int:pk>/', views.ProgressSessionView.as_view(), name='progress_session'),
 ]
